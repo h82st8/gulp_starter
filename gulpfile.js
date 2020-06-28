@@ -112,7 +112,7 @@ exports.js = js;
 
 const images = () => {
 	return gulp
-		.src("./src/img/*.*")
+		.src("./src/just_images/*.*")
 		.pipe(gulp.dest("./dist/images"))
 		.pipe(bwsync.stream());
 };
@@ -123,7 +123,7 @@ exports.images = images;
 
 const tinyimage = () => {
 	return gulp
-		.src("./src/images/**/**.*")
+		.src("./src/tiny_images/**/**.*")
 		.pipe(tinyimg("CNhnD3jhl1Bf9zyWH5dPgcYLQXpl5F4h"))
 		.pipe(gulp.dest("./dist/images"))
 		.pipe(bwsync.stream());
@@ -149,8 +149,8 @@ const watch = () => {
 	gulp.watch("./src/css/*.css", gulp.parallel(css));
 	gulp.watch("./src/*.html", gulp.parallel(html));
 	gulp.watch("./src/pug/*.pug", gulp.parallel(pug_html));
-	gulp.watch("./src/img/*.*", gulp.parallel(images));
-	gulp.watch("./src/images/**/**.*", gulp.parallel(tinyimage));
+	gulp.watch("./src/just_images/*.*", gulp.parallel(images));
+	gulp.watch("./src/tiny_images/**/**.*", gulp.parallel(tinyimage));
 	gulp.watch("./src/fonts/**.*", gulp.parallel(fonts));
 	gulp.watch("./src/js/**.*", gulp.parallel(js));
 };
