@@ -7,7 +7,8 @@ const gulp = require("gulp"),
   bwsync = require("browser-sync").create(),
   tinyimg = require("gulp-tinyimg"),
   pug = require("gulp-pug"),
-  sourcemaps = require("gulp-sourcemaps");
+  sourcemaps = require("gulp-sourcemaps"),
+  concat = require("gulp-concat");
 
 // SERVER
 
@@ -38,10 +39,10 @@ exports.html = html;
 
 const pug_html = () => {
   return gulp
-    .src("./src/pug/*.pug")
+    .src("./src/pug/pages/*.pug", "!./src/pug/includes/*.pug")
     .pipe(
       pug({
-        pretty: false,
+        pretty: true,
       })
     )
     .pipe(gulp.dest("./dist/"))
@@ -52,33 +53,33 @@ exports.pug_html = pug_html;
 
 // CSS
 
-const css = () => {
-  return gulp
-    .src("./src/css/*.css")
-    .pipe(
-      sass({
-        outputStyle: "compressed",
-      })
-    )
-    .pipe(rename({
-      suffix: ".min"
-    }))
-    .pipe(gulp.dest("./dist/css"))
-    .pipe(bwsync.stream());
-};
+// const css = () => {
+//   return gulp
+//     .src("./src/css/*.css")
+//     .pipe(
+//       sass({
+//         outputStyle: "compressed",
+//       })
+//     )
+//     .pipe(rename({
+//       suffix: ".min"
+//     }))
+//     .pipe(gulp.dest("./dist/css"))
+//     .pipe(bwsync.stream());
+// };
 
-exports.css = css;
+// exports.css = css;
 
 // STYLES
 
 const styles = () => {
   return gulp
-    .src(["./src/css/*.sass", "./src/css/*.scss", "!./src/css/**/_**.*"])
+    .src(["./src/css/*.css", "./src/css/*.sass", "./src/css/*.scss", "!./src/css/**/_**.*"])
     .pipe(sourcemaps.init())
     .pipe(
       sass({
         errorLogToConsole: true,
-        outputStyle: "compressed",
+        outputStyle: "expanded",
       })
     )
     .on("error", console.error.bind(console))
@@ -86,7 +87,8 @@ const styles = () => {
       autoprefixer({
         cascade: false,
       })
-    )
+  )
+    .pipe(concat("style.css"))
     .pipe(rename({
       suffix: ".min"
     }))
@@ -148,7 +150,7 @@ const build = (done) => {
   const buildHtml = gulp.src('./src/**/*.html')
     .pipe(gulp.dest('./dist'));
 
-  const buildPug = gulp.src("./src/pug/*.pug")
+  const buildPug = gulp.src("./src/pug/pages/*.pug", "!./src/pug/includes/*.pug")
     .pipe(
       pug({
         pretty: false,
@@ -162,8 +164,8 @@ const build = (done) => {
     }))
     .pipe(gulp.dest('./dist/css'));
 
-  const buildScss = gulp.src(["./src/css/*.sass", "./src/css/*.scss", "!./src/css/**/_**.*"])
-    .pipe(sourcemaps.init())
+  const buildScss = gulp.src(["./src/css/*.css", "./src/css/*.sass", "./src/css/*.scss", "!./src/css/**/_**.*"])
+    // .pipe(sourcemaps.init())
     .pipe(
       sass({
         errorLogToConsole: true,
@@ -175,11 +177,12 @@ const build = (done) => {
       autoprefixer({
         cascade: false,
       })
-    )
+  )
+    .pipe(concat("style.css"))
     .pipe(rename({
       suffix: ".min"
     }))
-    .pipe(sourcemaps.write("./"))
+    // .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest("./dist/css"));
 
   const buildJs = gulp.src('./src/js/**/*.js')
@@ -204,9 +207,9 @@ exports.build = build;
 
 const watch = () => {
   gulp.watch("./src/css/**/**.*", gulp.parallel(styles));
-  gulp.watch("./src/css/*.css", gulp.parallel(css));
+  // gulp.watch("./src/css/*.css", gulp.parallel(css));
   gulp.watch("./src/*.html", gulp.parallel(html));
-  gulp.watch("./src/pug/*.pug", gulp.parallel(pug_html));
+  gulp.watch("./src/pug/**/*.pug", gulp.parallel(pug_html));
   gulp.watch("./src/just_images/*.*", gulp.parallel(images));
   gulp.watch("./src/tiny_images/**/**.*", gulp.parallel(tinyimage));
   gulp.watch("./src/fonts/**.*", gulp.parallel(fonts));
